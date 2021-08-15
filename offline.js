@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1628751161,
+	"version": 1628949391,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -276,6 +276,10 @@
 		"images/profile_ramka-sheet2.png",
 		"images/grapheti_beta-sheet0.png",
 		"images/grapheti_beta-sheet1.png",
+		"images/pet-sheet0.png",
+		"images/pet-sheet1.png",
+		"images/pet-sheet2.png",
+		"images/spritefont_graps.png",
 		"media/batut.m4a",
 		"media/batut.ogg",
 		"media/gameover.m4a",
