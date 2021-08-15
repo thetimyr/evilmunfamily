@@ -2,6 +2,8 @@
 🎮 Evilmun Famile Scripts
 
 ![Игра](https://sun9-17.userapi.com/impg/XFLFW7mR4SGhMD8y2u5x83OEkiefrCQqMZU0Hw/eoWzX1dkiuI.jpg?size=1120x920&quality=96&sign=a3732f67510a3b57850735fe65f6a956&type=album)
+## Ознокомиться с игрой?
+Скачать игру с официального сайта - http://rombe.odej577537.nichost.ru/game/evilmun_family/
 ## О игре
 Evilmun - приключенческая игра, в жанре RPG-фэнтэзи.
 
