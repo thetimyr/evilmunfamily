@@ -30677,6 +30677,218 @@ cr.plugins_.WebStorage = function(runtime)
 }());
 ;
 ;
+cr.plugins_.filechooser = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var pluginProto = cr.plugins_.filechooser.prototype;
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
+	{
+	};
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	var instanceProto = pluginProto.Instance.prototype;
+	var c2URL = window["URL"] || window["webkitURL"] || window["mozURL"] || window["msURL"];
+	instanceProto.onCreate = function()
+	{
+		if (this.runtime.isDomFree)
+		{
+			cr.logexport("[Construct 2] File Chooser plugin not supported on this platform - the object will not be created");
+			return;
+		}
+		this.elem = document.createElement("input");
+		this.elem.type = "file";
+		this.elem.setAttribute("accept", this.properties[0]);
+		if (this.properties[1] !== 0)		// multiple selection
+			this.elem.setAttribute("multiple", "");
+		this.elem.id = this.properties[3];
+		jQuery(this.elem).appendTo(this.runtime.canvasdiv ? this.runtime.canvasdiv : "body");
+		this.element_hidden = false;
+		if (this.properties[2] === 0)
+		{
+			jQuery(this.elem).hide();
+			this.visible = false;
+			this.element_hidden = true;
+		}
+		var self = this;
+		this.elem.onchange = function ()
+		{
+			self.runtime.trigger(cr.plugins_.filechooser.prototype.cnds.OnChanged, self);
+		};
+		this.lastLeft = 0;
+		this.lastTop = 0;
+		this.lastRight = 0;
+		this.lastBottom = 0;
+		this.lastWinWidth = 0;
+		this.lastWinHeight = 0;
+		this.updatePosition(true);
+		this.runtime.tickMe(this);
+	};
+	instanceProto.onDestroy = function ()
+	{
+		if (this.runtime.isDomFree)
+			return;
+		jQuery(this.elem).remove();
+		this.elem = null;
+	};
+	instanceProto.tick = function ()
+	{
+		this.updatePosition();
+	};
+	var last_canvas_offset = null;
+	var last_checked_tick = -1;
+	instanceProto.updatePosition = function (first)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		var left = this.layer.layerToCanvas(this.x, this.y, true);
+		var top = this.layer.layerToCanvas(this.x, this.y, false);
+		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
+		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
+		var rightEdge = this.runtime.width / this.runtime.devicePixelRatio;
+		var bottomEdge = this.runtime.height / this.runtime.devicePixelRatio;
+		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= rightEdge || top >= bottomEdge)
+		{
+			if (!this.element_hidden)
+				jQuery(this.elem).hide();
+			this.element_hidden = true;
+			return;
+		}
+		if (left < 1)
+			left = 1;
+		if (top < 1)
+			top = 1;
+		if (right >= rightEdge)
+			right = rightEdge - 1;
+		if (bottom >= bottomEdge)
+			bottom = bottomEdge - 1;
+		var curWinWidth = window.innerWidth;
+		var curWinHeight = window.innerHeight;
+		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
+		{
+			if (this.element_hidden)
+			{
+				jQuery(this.elem).show();
+				this.element_hidden = false;
+			}
+			return;
+		}
+		this.lastLeft = left;
+		this.lastTop = top;
+		this.lastRight = right;
+		this.lastBottom = bottom;
+		this.lastWinWidth = curWinWidth;
+		this.lastWinHeight = curWinHeight;
+		if (this.element_hidden)
+		{
+			jQuery(this.elem).show();
+			this.element_hidden = false;
+		}
+		var offx = Math.round(left) + jQuery(this.runtime.canvas).offset().left;
+		var offy = Math.round(top) + jQuery(this.runtime.canvas).offset().top;
+		jQuery(this.elem).css("position", "absolute");
+		jQuery(this.elem).offset({left: offx, top: offy});
+		jQuery(this.elem).width(Math.round(right - left));
+		jQuery(this.elem).height(Math.round(bottom - top));
+	};
+	instanceProto.draw = function(ctx)
+	{
+	};
+	instanceProto.drawGL = function(glw)
+	{
+	};
+	function Cnds() {};
+	Cnds.prototype.OnChanged = function ()
+	{
+		return true;
+	};
+	pluginProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.SetVisible = function (vis)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.visible = (vis !== 0);
+	};
+	Acts.prototype.SetCSSStyle = function (p, v)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		jQuery(this.elem).css(p, v);
+	};
+	Acts.prototype.ReleaseFile = function (f)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		if (c2URL && c2URL["revokeObjectURL"])
+			c2URL["revokeObjectURL"](f);
+	};
+	pluginProto.acts = new Acts();
+	function Exps() {};
+	Exps.prototype.FileCount = function (ret)
+	{
+		ret.set_int(this.runtime.isDomFree ? 0 : (this.elem["files"].length || 0));
+	};
+	function getFileAt(files, index)
+	{
+		if (!files)
+			return null;
+		index = Math.floor(index);
+		if (index < 0 || index >= files.length)
+			return null;
+		return files[index];
+	};
+	Exps.prototype.FileNameAt = function (ret, i)
+	{
+		var file = this.runtime.isDomFree ? null : getFileAt(this.elem["files"], i);
+		ret.set_string(file ? (file["name"] || "") : "");
+	};
+	Exps.prototype.FileSizeAt = function (ret, i)
+	{
+		var file = this.runtime.isDomFree ? null : getFileAt(this.elem["files"], i);
+		ret.set_int(file ? (file["size"] || 0) : 0);
+	};
+	Exps.prototype.FileTypeAt = function (ret, i)
+	{
+		var file = this.runtime.isDomFree ? null : getFileAt(this.elem["files"], i);
+		ret.set_string(file ? (file["type"] || "") : "");
+	};
+	Exps.prototype.FileURLAt = function (ret, i)
+	{
+		var file = this.runtime.isDomFree ? null : getFileAt(this.elem["files"], i);
+		if (!file)
+		{
+			ret.set_string("");
+		}
+		else if (file["c2url"])		// already created object URL
+		{
+			ret.set_string(file["c2url"]);
+		}
+		else if (c2URL && c2URL["createObjectURL"])
+		{
+			file["c2url"] = c2URL["createObjectURL"](file);
+			ret.set_string(file["c2url"]);
+		}
+		else
+		{
+			ret.set_string("");
+		}
+	};
+	pluginProto.exps = new Exps();
+}());
+;
+;
 cr.plugins_.progressbar = function(runtime)
 {
 	this.runtime = runtime;
@@ -36791,28 +37003,29 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Audio,
 	cr.plugins_.Browser,
 	cr.plugins_.Button,
-	cr.plugins_.NodeWebkit,
 	cr.plugins_.List,
+	cr.plugins_.Keyboard,
 	cr.plugins_.LocalStorage,
 	cr.plugins_.Mouse,
+	cr.plugins_.filechooser,
+	cr.plugins_.NodeWebkit,
 	cr.plugins_.Particles,
 	cr.plugins_.Photon,
-	cr.plugins_.Keyboard,
 	cr.plugins_.PhotonChat,
 	cr.plugins_.progressbar,
 	cr.plugins_.Rex_Firebase,
 	cr.plugins_.Rex_FirebaseAPIV3,
 	cr.plugins_.Rex_Date,
-	cr.plugins_.Rex_Firebase_Storage,
 	cr.plugins_.Rex_Firebase_ItemTable,
-	cr.plugins_.Spritefont2,
-	cr.plugins_.Touch,
-	cr.plugins_.TiledBg,
-	cr.plugins_.UserMedia,
-	cr.plugins_.WebStorage,
+	cr.plugins_.Rex_Firebase_Storage,
 	cr.plugins_.Sprite,
-	cr.plugins_.Text,
+	cr.plugins_.TiledBg,
 	cr.plugins_.TextBox,
+	cr.plugins_.Touch,
+	cr.plugins_.Spritefont2,
+	cr.plugins_.WebStorage,
+	cr.plugins_.Text,
+	cr.plugins_.UserMedia,
 	cr.plugins_.sirg_notifications,
 	cr.behaviors.Pin,
 	cr.behaviors.Platform,
@@ -36951,6 +37164,20 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.cnds.IsVisible,
 	cr.system_object.prototype.cnds.LayerVisible,
 	cr.plugins_.TextBox.prototype.exps.Text,
+	cr.plugins_.filechooser.prototype.cnds.OnChanged,
+	cr.plugins_.Rex_Firebase_Storage.prototype.acts.UploadFromFileChooser,
+	cr.plugins_.progressbar.prototype.acts.SetVisible,
+	cr.plugins_.Rex_Firebase_Storage.prototype.cnds.OnUploadCompleted,
+	cr.plugins_.Rex_Firebase_Storage.prototype.acts.GetDownloadURL,
+	cr.plugins_.Rex_Firebase_Storage.prototype.cnds.OnGetDownloadURL,
+	cr.plugins_.Sprite.prototype.acts.LoadURL,
+	cr.plugins_.Rex_Firebase_Storage.prototype.exps.LastDownloadURL,
+	cr.plugins_.Rex_Firebase_Storage.prototype.cnds.OnDeleteCompleted,
+	cr.plugins_.Rex_Firebase_Storage.prototype.cnds.OnGetDownloadURLError,
+	cr.plugins_.Browser.prototype.acts.ConsoleLog,
+	cr.plugins_.Rex_Firebase_Storage.prototype.exps.LastErrorCode,
+	cr.plugins_.progressbar.prototype.acts.SetProgress,
+	cr.plugins_.Rex_Firebase_Storage.prototype.exps.Progress,
 	cr.plugins_.Touch.prototype.cnds.OnTapGesture,
 	cr.plugins_.Photon.prototype.acts.connect,
 	cr.plugins_.Photon.prototype.acts.leaveRoom,
@@ -36966,7 +37193,6 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Photon.prototype.acts.createRoom,
 	cr.plugins_.Photon.prototype.cnds.onJoinRoom,
 	cr.plugins_.Photon.prototype.acts.raiseEvent,
-	cr.plugins_.Sprite.prototype.acts.LoadURL,
 	cr.plugins_.Photon.prototype.exps.RoomPlayerCount,
 	cr.plugins_.Photon.prototype.exps.MyRoomName,
 	cr.plugins_.Photon.prototype.cnds.onEvent,
@@ -37017,7 +37243,6 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.cnds.IsBoolInstanceVarSet,
 	cr.plugins_.Sprite.prototype.acts.MoveAtAngle,
 	cr.plugins_.Sprite.prototype.acts.ToggleBoolInstanceVar,
-	cr.plugins_.progressbar.prototype.acts.SetProgress,
 	cr.behaviors.EightDir.prototype.acts.SetEnabled,
 	cr.system_object.prototype.exps.cpuutilisation,
 	cr.system_object.prototype.exps.imagememoryusage,
@@ -37066,8 +37291,6 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.progressbar.prototype.acts.Destroy,
 	cr.plugins_.Rex_Firebase_Storage.prototype.acts.UploadObjectURL,
 	cr.system_object.prototype.exps.canvassnapshot,
-	cr.plugins_.Rex_Firebase_Storage.prototype.cnds.OnUploadCompleted,
-	cr.plugins_.Rex_Firebase_Storage.prototype.acts.GetDownloadURL,
 	cr.plugins_.List.prototype.acts.SetInstanceVar,
 	cr.system_object.prototype.acts.SetPixelRounding,
 	cr.system_object.prototype.acts.SetLayerEffectParam

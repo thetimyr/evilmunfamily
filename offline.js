@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1629365473,
+	"version": 1629547236,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -280,6 +280,10 @@
 		"images/pet-sheet1.png",
 		"images/pet-sheet2.png",
 		"images/spritefont_graps.png",
+		"images/profile_img-sheet0.png",
+		"images/ellipse-sheet0.png",
+		"images/ellipse-sheet1.png",
+		"images/ellipse-sheet2.png",
 		"media/batut.m4a",
 		"media/batut.ogg",
 		"media/gameover.m4a",
