@@ -3,7 +3,7 @@
 
 [Evilmun Family - Файлы другого типа](https://github.com/thetimyr/evilmunfamily_roombers)
 
-![Игра](https://sun9-17.userapi.com/impg/XFLFW7mR4SGhMD8y2u5x83OEkiefrCQqMZU0Hw/eoWzX1dkiuI.jpg?size=1120x920&quality=96&sign=a3732f67510a3b57850735fe65f6a956&type=album)
+![Игра](https://github.com/thetimyr/evilmunfamily/blob/main/logo_github.png?raw=true)
 ## Ознокомиться с игрой?
 Скачать игру с официального сайта - http://rombe.odej577537.nichost.ru/game/evilmun_family/
 ## О игре
