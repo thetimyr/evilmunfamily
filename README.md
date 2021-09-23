@@ -6,6 +6,7 @@
 ![Игра](https://github.com/thetimyr/evilmunfamily/blob/main/logo_github.png?raw=true)
 ## Ознокомиться с игрой?
 Скачать игру с официального сайта - http://rombe.odej577537.nichost.ru/game/evilmun_family/
+Поиграть в режиме реального временни - https://jolly-spence-dbad86.netlify.app/
 ## О игре
 Evilmun - приключенческая игра, в жанре RPG-фэнтэзи.
 
