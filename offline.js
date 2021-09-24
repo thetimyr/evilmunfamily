@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1629547236,
+	"version": 1632510117,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -60,6 +60,7 @@
 		"images/fon-sheet0.png",
 		"images/sprite2-sheet0.png",
 		"images/sprite3-sheet0.png",
+		"images/sprite3-sheet1.png",
 		"images/stenablok1-sheet0.png",
 		"images/stenablok2-sheet0.png",
 		"images/stenablok3-sheet0.png",
@@ -82,7 +83,6 @@
 		"images/sprite4-sheet0.png",
 		"images/knopka3-sheet0.png",
 		"images/knopka3-sheet1.png",
-		"images/knopka3-sheet2.png",
 		"images/zabor3-sheet0.png",
 		"images/zabor3-sheet1.png",
 		"images/logo-sheet0.png",
@@ -155,6 +155,7 @@
 		"images/fones_1-sheet0.png",
 		"images/fones_1-sheet1.png",
 		"images/fones_1-sheet2.png",
+		"images/fones_1-sheet3.png",
 		"images/sprite17-sheet0.png",
 		"images/gifs1-sheet0.png",
 		"images/gifs1-sheet1.png",
@@ -284,6 +285,7 @@
 		"images/ellipse-sheet0.png",
 		"images/ellipse-sheet1.png",
 		"images/ellipse-sheet2.png",
+		"images/sprite53-sheet0.png",
 		"media/batut.m4a",
 		"media/batut.ogg",
 		"media/gameover.m4a",
